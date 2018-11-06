@@ -61,8 +61,8 @@ int main(int argc, char** argv){
 
                 }while(*recieve_data != 0xa0);
 
-                serialPort->readData(true,recieve_data+1,31);
-                if(recieve_data[0] == 0xa0 && recieve_data[5] == 0xb0 && recieve_data[18] == 0xc0 && recieve_data[31] == 0xd0){
+                serialPort->readData(true,recieve_data+1,44);
+                if(recieve_data[0] == 0xa0 && recieve_data[5] == 0xb0 && recieve_data[18] == 0xc0 && recieve_data[31] == 0xd0 && recieve_data[44] == 0xe0){
                     cout<< "connect success" <<endl;
                     Task = SerialConnecting_Success;
                 }
@@ -70,9 +70,9 @@ int main(int argc, char** argv){
             }
             case SerialConnecting_Success:{
 
-                serialPort->readData(true,recieve_data,32);
+                serialPort->readData(true,recieve_data,45);
                 if(recieve_data[0] == 0xa0 && recieve_data[5] == 0xb0 \
-                        && recieve_data[18] == 0xc0 && recieve_data[31] == 0xd0){
+                        && recieve_data[18] == 0xc0 && recieve_data[31] == 0xd0 && recieve_data[44] == 0xe0){
 
 
                     recieve_count++;
@@ -102,10 +102,14 @@ int main(int argc, char** argv){
                     origin_attitude.acc.y =(int16_t)(recieve_data[27]*256 + recieve_data[28]) ;
                     origin_attitude.acc.z =(int16_t)(recieve_data[29]*256 + recieve_data[30]) ;
 
+                    origin_attitude.q_data.yaw = byteTofloat(recieve_data+32);
+                    origin_attitude.q_data.pitch = byteTofloat(recieve_data+36);
+                    origin_attitude.q_data.roll = byteTofloat(recieve_data+40);
+
  #if writeEABLE
 
                     Writefile.write((char*)&origin_attitude,sizeof(origin_attitude));
-                    if(timercount >= 9){
+                    if(timercount >= 30){
                         Writefile.close();
                         cout << recieve_count * sizeof(origin_attitude) <<endl;
                         Task = SerialComplete;

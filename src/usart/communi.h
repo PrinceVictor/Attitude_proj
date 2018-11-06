@@ -38,6 +38,7 @@ typedef struct{
 
 typedef struct{
     imu_data dmp_data;
+    imu_data q_data;
     mpu_data gyro;
     mpu_data acc;
     float IMU_yaw;
